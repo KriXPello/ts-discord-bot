@@ -1,8 +1,12 @@
 import { error } from '../logger/logger'
 
-import { MessageHandler, ExtendedMessage } from './message-types'
+import {
+  MessageHandler,
+  ExtendedMessage,
+  MessageRouter
+} from './message-types'
 
-const messageRouter: Map<string, MessageHandler> = new Map
+const messageRouter: MessageRouter = new Map
 
 export const regMessageHandler = (name: string, fn: MessageHandler): void => {
   messageRouter.set(name, fn)

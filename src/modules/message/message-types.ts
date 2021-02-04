@@ -1,4 +1,4 @@
-import { GuildChannel, Message, MessageEmbed, NewsChannel, TextChannel } from 'discord.js'
+import { Message, MessageEmbed } from 'discord.js'
 
 export interface ExtendedMessage extends Message {
   answer(str: string | MessageEmbed): Promise<Message>
@@ -8,3 +8,12 @@ export interface ExtendedMessage extends Message {
 }
 
 export type MessageHandler = (message: ExtendedMessage) => Promise<void>
+
+export type MessageRouter = Map<string, MessageHandler>
+
+export type StatObj = {
+  name: string,
+  count: number
+}
+
+export type SortFunc = (obj: any) => Promise<StatObj[]>
