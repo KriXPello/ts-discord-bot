@@ -12,19 +12,22 @@ const getTime = (): string => {
 let stream: null | WriteStream = null
 
 export const startLogging = async (): Promise<void> => {
-  const validTime = getTime()
-    .replaceAll('.', '-')
-    .replaceAll(':', '-')
-    .replace(' ', '_')
+  // * Удалено из-за косяка с созданием файла в ubuntu
+  // const validTime = getTime()
+  //   .replaceAll('.', '-')
+  //   .replaceAll(':', '-')
+  //   .replace(' ', '_')
 
-  const logName = `./logs/${validTime} log.txt`
+  const time = new Date().getTime()
+
+  const logName = `./logs/${time}log.txt`
 
   try {
     await stat('./logs/')
   } catch (e) {
     await mkdir('./logs')
   }
-  
+
   stream = createWriteStream(logName)
 
   stream.on('open', () => console.log('Logging started'))

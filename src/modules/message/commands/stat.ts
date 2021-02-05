@@ -33,7 +33,6 @@ export const handlerStat = async (message: ExtendedMessage) => {
 
   const channel: GuildChannel = message.channel as GuildChannel
 
-
   const roles = channel.guild.roles.cache
   const members = channel.guild.members.cache
 
