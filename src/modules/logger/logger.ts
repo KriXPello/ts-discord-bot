@@ -1,7 +1,7 @@
 import { mkdir, stat } from 'fs/promises'
 import { createWriteStream, WriteStream } from 'fs'
 
-const getTime = (): string => {
+const getLogTime = (): string => {
   const date = new Date()
   const dmy = date.toLocaleDateString()
   const hms = date.toLocaleTimeString()
@@ -12,15 +12,19 @@ const getTime = (): string => {
 let stream: null | WriteStream = null
 
 export const startLogging = async (): Promise<void> => {
-  // * Удалено из-за косяка с созданием файла в ubuntu
-  // const validTime = getTime()
-  //   .replaceAll('.', '-')
-  //   .replaceAll(':', '-')
-  //   .replace(' ', '_')
+  const now = new Date()
 
-  const time = new Date().getTime()
+  const fileName = [
+    now.getDate(),
+    now.getMonth() + 1,
+    now.getFullYear(),
+    '--',
+    now.getHours(),
+    now.getMinutes(),
+    now.getSeconds()
+  ].map(el => String(el).padStart(2, '0')).join('-')
 
-  const logName = `./logs/${time}log.txt`
+  const logName = `./logs/${fileName}_log.txt`
 
   try {
     await stat('./logs/')
@@ -36,10 +40,10 @@ export const startLogging = async (): Promise<void> => {
 
 export const log = (...info: string[]): void => {
   if (stream)
-    stream.write(`LOG  ${getTime()}  ${info.join(' ')}\n`)
+    stream.write(`LOG  ${getLogTime()}  ${info.join(' ')}\n`)
 }
 
 export const error = (...info: string[]): void => {
   if (stream)
-    stream.write(`ERROR  ${getTime()}  ${info.join(' ')}\n`)
+    stream.write(`ERROR  ${getLogTime()}  ${info.join(' ')}\n`)
 }

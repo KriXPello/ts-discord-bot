@@ -1,22 +1,19 @@
 import { GuildMember } from 'discord.js';
 
 import { getOptions } from '../fileManager/file-manager';
-import { error } from '../logger/logger';
+
+import { checkName } from '../memberUpdate/inspectors/nick';
+import { mentionMember, sendToChannel } from '../tools';
 
 export const onMemberAdd = async (member: GuildMember): Promise<void> => {
-  const nick = member.user.username.slice(0, 25) + ' (имя?)'
+  const name = member.user.username
+  const { welcomeChannel, welcomeMessage } = await getOptions()
 
-  await member.setNickname(nick)
+  await checkName(member, name)
 
-  const { defaultRole } = await getOptions()
+  if (! (welcomeChannel && welcomeMessage)) return
 
-  if (defaultRole) {
-    try {
-      const role = await member.guild.roles.fetch(defaultRole)
+  let text = mentionMember(welcomeMessage, member)
 
-      member.roles.add(role)
-    } catch (e) {
-      error('Failed to add defaultRole', defaultRole, e.message)
-    }
-  }
+  await sendToChannel(member, welcomeChannel, text)
 }
