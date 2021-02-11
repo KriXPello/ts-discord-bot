@@ -11,7 +11,7 @@ export const start = async (): Promise<void> => {
   await startLogging()
   await initFileManager()
 
-  process.on('uncaughtException', er => error(er.name, ':', er.message))
+  process.on('uncaughtException', er => error(er.stack))
 
   const client = new Client()
   const token = await getToken()

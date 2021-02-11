@@ -3,32 +3,18 @@ import { GuildMember } from 'discord.js';
 import { getOptions } from '../../fileManager/file-manager';
 import { error } from '../../logger/logger';
 
-/**
- * Возвращает массив функций...
- * [0] - addRole
- * [1] - removeRole
- */
-const createRoleChangers = (member: GuildMember) => {
-  return [
-    async (roleId: string): Promise<void> => {
-      try {
-        const role = await member.guild.roles.fetch(roleId)
+import { createRoleManagers, getRole } from '../../tools';
 
-        await member.roles.add(role)
-      } catch {
-        error('nick inspector: failed to add role', roleId)
-      }
-    },
-    async (roleId: string): Promise<void> => {
-      try {
-        const role = await member.guild.roles.fetch(roleId)
+// Проверяет, есть ли у пользователя роль которая по списку выше указанной
+const haveHigherRole = async (
+  member: GuildMember,
+  roleId: string
+): Promise<boolean> => {
+  const role = await getRole(member.guild, roleId)
 
-        await member.roles.remove(role)
-      } catch {
-        error('nick inspector: failed to remove role', roleId)
-      }
-    }
-  ]
+  if (! role) return false
+
+  return !! member.roles.cache.find(r => r.rawPosition > role.rawPosition)
 }
 
 const isValidRegexp = /\([A-zА-я\s]{2,}\)$/
@@ -37,33 +23,40 @@ export const checkName = async (
   member: GuildMember,
   name: string
 ): Promise<void> => {
-  const { defaultRole, nickRole } = await getOptions()
-  const isValid = isValidRegexp.test(name)
+  try {
+    if (member.guild.ownerID == member.user.id) return
 
-  const haveDefaultRole = member.roles.cache.has(defaultRole)
-  const haveNickRole = member.roles.cache.has(nickRole)
+    const { defaultRole, nickRole } = await getOptions()
+    const hRHTNR = await haveHigherRole(member, nickRole) // have Role Higher Than Nick Role
 
-  const [addRole, removeRole] = createRoleChangers(member)
+    const [haveRole, addRole, removeRole] = createRoleManagers(member)
 
-  if (isValid) {
-    if (! nickRole) return
+    const haveDefaultRole = await haveRole(defaultRole)
+    const haveNickRole = await haveRole(nickRole)
+    const isValid = isValidRegexp.test(name)
 
-    if (! haveNickRole)
-      addRole(nickRole)
+    // Здесь нет await потому что ждать результата нет смысла
+    if (isValid) {
+      if (! nickRole) return
 
-    if (defaultRole && haveDefaultRole)
-      removeRole(defaultRole)
-  } else {
-    if (! defaultRole) return
+      if (! hRHTNR)
+        addRole(nickRole)
 
-    if (! haveDefaultRole)
-      addRole(defaultRole)
+      if (defaultRole && haveDefaultRole)
+        removeRole(defaultRole)
+    } else {
+      if (! defaultRole || hRHTNR) return
 
-    if (nickRole && haveNickRole)
-      removeRole(nickRole)
+      if (! haveDefaultRole && defaultRole)
+        addRole(defaultRole)
 
-    if (name.includes('(имя?)')) return
+      if (haveNickRole)
+        removeRole(nickRole)
 
-    await member.setNickname(name.slice(0, 25) + ' (имя?)')
+      if (! name.includes('(имя?)'))
+        member.setNickname(name.slice(0, 25) + ' (имя?)')
+    }
+  } catch (e) {
+    error('check nick error:', e.message)
   }
 }
