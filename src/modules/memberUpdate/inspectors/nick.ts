@@ -3,7 +3,7 @@ import { GuildMember } from 'discord.js';
 import { getOptions } from '../../fileManager/file-manager';
 import { error } from '../../logger/logger';
 
-import { createRoleManagers, getRole } from '../../tools';
+import { createRoleManagers, getRole, sendToChannel } from '../../tools';
 
 // Проверяет, есть ли у пользователя роль которая по списку выше указанной
 const haveHigherRole = async (
@@ -24,15 +24,18 @@ export const checkName = async (
   name: string
 ): Promise<void> => {
   try {
-    if (member.guild.ownerID == member.user.id) return
+    const { guild, client } = member
+    const guildOwner = guild.owner
 
-    const { defaultRole, nickRole } = await getOptions()
-    const hRHTNR = await haveHigherRole(member, nickRole) // have Role Higher Than Nick Role
+    if (guildOwner.id == member.user.id) return
+
+    const { defaultRole, nickRole, reportsChannel } = await getOptions()
 
     const [haveRole, addRole, removeRole] = createRoleManagers(member)
 
     const haveDefaultRole = await haveRole(defaultRole)
     const haveNickRole = await haveRole(nickRole)
+    const hRHTNR = await haveHigherRole(member, nickRole) // have Role Higher Than Nick Role
     const isValid = isValidRegexp.test(name)
 
     // Здесь нет await потому что ждать результата нет смысла
@@ -42,10 +45,19 @@ export const checkName = async (
       if (! hRHTNR)
         addRole(nickRole)
 
-      if (defaultRole && haveDefaultRole)
+      if (haveDefaultRole && defaultRole)
         removeRole(defaultRole)
     } else {
-      if (! defaultRole || hRHTNR) return
+      if (hRHTNR) {
+        const text = [
+          `Доверенный пользователь <@${member.id}>`,
+          'сменил ник на некорректный.'
+        ].join(' ')
+
+        sendToChannel(member, reportsChannel, text)
+
+        return
+      }
 
       if (! haveDefaultRole && defaultRole)
         addRole(defaultRole)

@@ -7,4 +7,5 @@ export type Options = {
   punishRole: string,
   punishChannel: string,
   punishMessage: string,
+  reportsChannel: string
 }

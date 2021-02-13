@@ -10,6 +10,8 @@ export const sendToChannel = async (
   channelId: string,
   text: string
 ): Promise<void> => {
+  if (! (channelId && text)) return
+
   try {
     const channel = await member.client.channels
       .fetch(channelId) as TextChannel
