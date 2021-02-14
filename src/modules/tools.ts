@@ -1,4 +1,4 @@
-import { Guild, GuildMember, Role, TextChannel } from 'discord.js'
+import { Guild, GuildMember, MessageEmbed, Role, TextChannel } from 'discord.js'
 
 import { error } from './logger/logger'
 
@@ -8,15 +8,15 @@ export const mentionMember = (text: string, member: GuildMember): string =>
 export const sendToChannel = async (
   member: GuildMember,
   channelId: string,
-  text: string
+  message: string | MessageEmbed
 ): Promise<void> => {
-  if (! (channelId && text)) return
+  if (! (channelId && message)) return
 
   try {
     const channel = await member.client.channels
       .fetch(channelId) as TextChannel
 
-    channel.send(text)
+    channel.send(message)
   } catch (e) {
     error('Failed to send message to', channelId, e.message)
   }

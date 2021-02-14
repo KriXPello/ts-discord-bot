@@ -9,7 +9,7 @@ export const onMemberUpdate = async (
 ): Promise<void> => {
   const newRoles = newMember.roles.cache.array()
   const oldRoles = oldMember.roles.cache.array()
-  const newNick = newMember.nickname || newMember.user.username
+  const newNick = newMember.displayName // https://discord.js.org/#/docs/main/stable/class/GuildMember?scrollTo=displayName
 
   const [updatedRole] = newRoles.filter(a => oldRoles.indexOf(a) == -1)
 

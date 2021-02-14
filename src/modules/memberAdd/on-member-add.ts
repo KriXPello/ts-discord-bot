@@ -15,5 +15,5 @@ export const onMemberAdd = async (member: GuildMember): Promise<void> => {
 
   let text = mentionMember(welcomeMessage, member)
 
-  await sendToChannel(member, welcomeChannel, text)
+  sendToChannel(member, welcomeChannel, text)
 }

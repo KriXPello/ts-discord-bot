@@ -14,7 +14,7 @@ const handlerSet: MessageHandler = async (message: ExtendedMessage): Promise<voi
 
   if (! param) {
     message.answer(
-      'Вы не указали *настройку*, которую нужно изменить' +
+      'Вы не указали *настройку*, которую нужно изменить\n' +
       '```!set <настройка> <значение>```'
     )
 

@@ -14,7 +14,7 @@ const haveHigherRole = async (
 
   if (! role) return false
 
-  return !! member.roles.cache.find(r => r.rawPosition > role.rawPosition)
+  return member.roles.highest.rawPosition > role.rawPosition
 }
 
 const isValidRegexp = /\([A-zА-я\s]{2,}\)$/
@@ -24,7 +24,7 @@ export const checkName = async (
   name: string
 ): Promise<void> => {
   try {
-    const { guild, client } = member
+    const { guild } = member
     const guildOwner = guild.owner
 
     if (guildOwner.id == member.user.id) return
@@ -51,7 +51,8 @@ export const checkName = async (
       if (hRHTNR) {
         const text = [
           `Доверенный пользователь <@${member.id}>`,
-          'сменил ник на некорректный.'
+          'имеет некорректный ник:',
+          `\`${member.displayName}\``
         ].join(' ')
 
         sendToChannel(member, reportsChannel, text)

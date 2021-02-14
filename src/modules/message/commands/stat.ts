@@ -31,7 +31,7 @@ const createSort = (stat: any): SortFunc => {
 export const handlerStat = async (message: ExtendedMessage) => {
   const { param } = message
 
-  const channel: GuildChannel = message.channel as GuildChannel
+  const channel = message.channel as GuildChannel
 
   const roles = channel.guild.roles.cache
   const members = channel.guild.members.cache
