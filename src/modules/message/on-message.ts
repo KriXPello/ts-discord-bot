@@ -1,8 +1,9 @@
 import { Message } from 'discord.js'
 
 import { getOptions } from '../fileManager/file-manager'
+import { error } from '../logger/logger'
 
-import { handleMessage } from './message-router'
+import { getHandler } from './message-router'
 
 import { ExtendedMessage } from './message-types'
 
@@ -10,7 +11,6 @@ import { ExtendedMessage } from './message-types'
 import './commands/commands-aggregator'
 
 export const onMessage = async (message: Message): Promise<void> => {
-
   if (! message.content.startsWith('!')) return
   if (message.client.user.id == message.author.id) return
 
@@ -21,6 +21,10 @@ export const onMessage = async (message: Message): Promise<void> => {
   const [command, param, ...value] = parts
 
   if (! command) return
+
+  const handler = getHandler(command)
+
+  if (! handler) return
 
   const extended: ExtendedMessage = Object.assign({
     async answer(str: string): Promise<Message> {
@@ -41,5 +45,11 @@ export const onMessage = async (message: Message): Promise<void> => {
     return
   }
 
-  await handleMessage(command, extended)
+  try {
+    await handler(extended)
+  } catch (e) {
+    error(e.message)
+
+    await extended.answer('Произошла ошибка')
+  }
 }
