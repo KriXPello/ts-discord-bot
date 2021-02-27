@@ -17,7 +17,8 @@ const haveHigherRole = async (
   return member.roles.highest.rawPosition > role.rawPosition
 }
 
-const isValidRegexp = /\([A-zА-я\s]{2,}\)$/
+//const isValidRegexp = /\([A-zА-я\s]{2,}\)$/
+const isValidRegexp = /\([А-Яа-яA-Za-z\sё^_.,`]{2,}\)$/
 
 export const checkName = async (
   member: GuildMember,
