@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": ["esnext"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+
+    "baseUrl": "src",
+    "paths": {
+      "@options": ["./modules/file-manager/options"]
+    }
+  }
+}
