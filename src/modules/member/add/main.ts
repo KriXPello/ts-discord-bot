@@ -6,7 +6,7 @@ import { addRole, checkBlock, checkName, toWhitelist } from '../manager'
 import { mentionMember, sendToChannel } from 'modules/tools'
 
 export const onMemberAdd = async (member: GuildMember): Promise<void> => {
-  const { welcomeChannel, welcomeMessage, punishRole, nickRole } = getOptions()
+  const { defaultRole, welcomeChannel, welcomeMessage, punishRole, nickRole } = getOptions()
 
   const isBlocked = await checkBlock(member)
 
@@ -23,7 +23,9 @@ export const onMemberAdd = async (member: GuildMember): Promise<void> => {
 
     await toWhitelist(member)
   } else {
-    member.setNickname(member.displayName.slice(0, 25) + ' (имя?)')
+    await member.setNickname(member.displayName.slice(0, 25) + ' (имя?)')
+
+    await addRole(member, defaultRole)
   }
 
   if (! (welcomeChannel && welcomeMessage)) return

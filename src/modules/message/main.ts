@@ -9,6 +9,7 @@ import { ExtendedMessage } from './types'
 import './commands/options'
 import './commands/set'
 import './commands/stat'
+import './commands/get-valid-ids'
 
 export const onMessage = async (message: Message): Promise<void> => {
   if (! message.content.startsWith('!')) return
@@ -49,5 +50,7 @@ export const onMessage = async (message: Message): Promise<void> => {
     await handler(extended)
   } catch (e) {
     extended.answer('Произошла ошибка')
+
+    console.log('Message handle failed', e.message)
   }
 }

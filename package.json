@@ -4,7 +4,8 @@
   "description": "",
   "type": "commonjs",
   "scripts": {
-    "bns": "rollup -c && node ./dist/index.js"
+    "bns": "rollup -c && node ./dist/index.js",
+    "build": "rollup -c"
   },
   "keywords": [],
   "author": "KriXPello",

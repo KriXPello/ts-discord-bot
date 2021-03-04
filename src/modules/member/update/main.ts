@@ -9,6 +9,7 @@ import {
   fromBlacklist,
   fromWhitelist,
   haveRole,
+  removeRole,
   toBlacklist,
   toWhitelist
 } from '../manager'
@@ -19,6 +20,7 @@ export const onMemberUpdate = async (
   newMember: GuildMember
 ): Promise<void> => {
   const {
+    defaultRole,
     nickRole,
     punishRole,
     punishMessage,
@@ -31,8 +33,6 @@ export const onMemberUpdate = async (
   const oldRoles = oldMember.roles.cache.array()
   const newRoles = newMember.roles.cache.array()
 
-  console.log('Member updating')
-
   // *Обработчик изменения ника
   if (oldName != newName) {
     if (await haveRole(newMember, punishRole)) return
@@ -40,8 +40,6 @@ export const onMemberUpdate = async (
     const isOldNameValid = await checkName(oldMember)
     const isNewNameValid = await checkName(newMember)
     const isMemberTrusted = await checkTrust(newMember)
-
-    console.log('Триггер смены ника', isOldNameValid, isNewNameValid, isMemberTrusted)
 
     // Ник корректный -> некорректный И пользователь доверенный
     // Уведомить о том, что доверенный пользователь сменил корректный ник на некорректный
@@ -77,8 +75,13 @@ export const onMemberUpdate = async (
     if (! isMemberTrusted && ! isOldNameValid && isNewNameValid) {
       await toWhitelist(newMember)
 
-      if (nickRole)
+      if (nickRole) {
         await addRole(newMember, nickRole)
+
+        if (defaultRole) {
+          await removeRole(newMember, defaultRole)
+        }
+      }
 
       return
     }
@@ -88,8 +91,6 @@ export const onMemberUpdate = async (
   if (oldRoles.length != newRoles.length) {
     const [ addedRole ] = newRoles.filter(r => ! oldRoles.find(f => f.id == r.id))
     const [ removedRole ] = oldRoles.filter(r => ! newRoles.find(f => f.id == r.id))
-
-    console.log('Триггер смены роли', addedRole, removedRole)
 
     // Добавилась роль и эта роль является punishRole
     // Удалить пользователя из списка доверенных и добавить в список недоверенных и отправить сообщение (если есть)
