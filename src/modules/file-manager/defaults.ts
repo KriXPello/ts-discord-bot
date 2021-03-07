@@ -9,6 +9,9 @@ export const optionsD = JSON.stringify({
   punishRole: null,
   punishChannel: null,
   punishMessage: null,
+  reportsChannel: null,
+  reactionsMessageId: null,
+  reactionsChannel: null
 })
 
 export const blacklistD = JSON.stringify([])

@@ -10,6 +10,7 @@ import './commands/options'
 import './commands/set'
 import './commands/stat'
 import './commands/get-valid-ids'
+import './commands/init-reactions'
 
 export const onMessage = async (message: Message): Promise<void> => {
   if (! message.content.startsWith('!')) return
@@ -33,6 +34,7 @@ export const onMessage = async (message: Message): Promise<void> => {
     },
     param,
     value: value.join(' '),
+    client: message.client
   }, message)
 
   const { ownerRole } = getOptions()

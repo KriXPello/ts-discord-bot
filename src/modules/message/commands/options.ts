@@ -4,9 +4,9 @@ import { getOptions } from '@options'
 
 import { regMessageHandler } from '../commands-router'
 
-import { MessageHandler, ExtendedMessage } from '../types'
+import { ExtendedMessage } from '../types'
 
-const handlerOptions: MessageHandler = async (message: ExtendedMessage): Promise<void> => {
+const handlerOptions = async (message: ExtendedMessage): Promise<void> => {
   const optionsMessage = new MessageEmbed()
     .setTitle('Настройки')
 

@@ -8,10 +8,14 @@ let options: Options
 const PATH = './storages/options.json'
 
 const updateOptions = async (): Promise<void> => {
-  const newOptionsJSON = await readFile(PATH, 'utf8')
-  const newOptions = JSON.parse(newOptionsJSON)
+  try {
+    const newOptionsJSON = await readFile(PATH, 'utf8')
+    const newOptions = JSON.parse(newOptionsJSON)
 
-  options = newOptions
+    options = newOptions
+  } catch (e) {
+    console.log('Options update error:', e.message)
+  }
 }
 
 export const initOptionsWatcher = async () => {

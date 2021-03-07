@@ -1,14 +1,15 @@
 import { getOptions, setOptions } from '@options'
+import { reactionHandlerInit } from 'modules/reaction/main'
 
 import { regMessageHandler } from '../commands-router'
 
-import { ExtendedMessage, MessageHandler } from '../types'
+import { ExtendedMessage } from '../types'
 
 const isMentionRegexp = /<[\@\!\#\&\:\a]*?[A-zА-я0-9\s]*>/
 // Для удаления символов по типу @!#&:a<>  и получения чистого id
 const clearMentionRegexp = /[^0-9]/g
 
-const handlerSet: MessageHandler = async (message: ExtendedMessage) => {
+const handlerSet = async (message: ExtendedMessage) => {
   let { param, value } = message
 
   if (! param) {
@@ -41,12 +42,6 @@ const handlerSet: MessageHandler = async (message: ExtendedMessage) => {
     return
   }
 
-  // TODO:
-  /**
-   * if param.includes('Emoji') ...
-   * https://discord.com/developers/docs/reference#message-formatting
-   */
-
   // Чтобы не установить текст или mention в качестве id канала или роли
   if (param.includes('Channel') || param.includes('Role')) {
     value = value.split(' ').shift()
@@ -58,6 +53,12 @@ const handlerSet: MessageHandler = async (message: ExtendedMessage) => {
   options[param] = value
 
   await setOptions(options)
+
+  if (param == 'reactionsMessageId') {
+    await reactionHandlerInit(message.client, message)
+
+    return
+  }
 
   message.answer(`Значение ${param} изменено`)
 }
