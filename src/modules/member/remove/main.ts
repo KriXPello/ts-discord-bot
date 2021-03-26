@@ -3,7 +3,7 @@ import { GuildMember, MessageEmbed } from 'discord.js';
 import { getOptions } from '@options';
 
 import { sendToChannel } from 'modules/tools';
-import { fromWhitelist } from '../manager';
+import { fromWhitelist, toBlacklist } from '../manager';
 
 export const onMemberRemove = async (member: GuildMember) => {
   const { reportsChannel } = getOptions()
@@ -21,4 +21,5 @@ export const onMemberRemove = async (member: GuildMember) => {
   sendToChannel(member.guild, reportsChannel, msg)
 
   fromWhitelist(member)
+  toBlacklist(member)
 }
